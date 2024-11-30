@@ -27,6 +27,7 @@ function setMinDateForInputs() {
 }
 
 // Gallery data
+// Integrating surroundings data into the existing galleryData
 const galleryData = {
     bathroom: [
         { image: "images/dolni-koupelna-1.jpg", text: "Dolní koupelna" },
@@ -52,10 +53,129 @@ const galleryData = {
         { image: "images/vchod.jpg", text: "Vchod" },
     ],
     surroundings: [
-        { image: "images/sjezdovka-nedaleko.jpeg", text: "Sjezdovka nedaleko" },
-        { image: "images/zimni-priroda.jpeg", text: "Zimní příroda" },
+        {
+            image: "images/Stezka_korunami_stromu.jpg",
+            text: 'Stezka korunami stromů',
+            source: "https://duckduckgo.com/?q=lipno+fotky+zima&iar=images&iax=images&ia=images&iai=https%3A%2F%2Fvcdn.bergfex.at%2Fimages%2Fresized%2Fprofiles%2Fdetail%2Fcfd%2F14b68548b08bc693533e2aed7f7e4cfd.jpg"
+        },
+        {
+            image: "images/rozhledna.jpg",
+            text: 'Rozhledna Dobrá Voda',
+            source: "https://www.sumava-lipno.eu/rozhledna-dobra-voda/"
+        },
+        {
+            image: "images/Zamrzle_lipno.jpg",
+            text: 'Zamrzlé Lipno',
+            source: "https://www.rajce.idnes.cz/mabelfotky/album/dovolena-lipno-zima-2013/726483535"
+        },
     ],
 };
+
+// Data pro sekci "Build"
+const buildImages = [
+    { 
+        url: "images/brusle.jpg", 
+        description: "Bruslení na zamrzlém jezeře", 
+        source: "https://www.lipno.info/novinky/zakaz-brusleni-a-vstupu-na-led.html" 
+    },
+    { 
+        url: "images/rozhledna-dobra-voda.jpeg", 
+        description: "Rozhledna Dobrá Voda", 
+        source: "https://www.jiznicechy.cz/turisticke-cile/1983-rozhledna-dobra-voda" 
+    },
+    { 
+        url: "images/stezka.jpeg", 
+        description: "Stezka v korunách stromů", 
+        source: "https://www.stezkakorunamistromu.cz/fotogalerie/zima-ea6bd2pe4g" 
+    }
+];
+
+function renderBuildCarousel() {
+    const carouselInner = document.querySelector('#buildCarousel .carousel-inner');
+    carouselInner.innerHTML = ''; // Vymaže aktuální obsah
+
+    buildImages.forEach((image, index) => {
+        const carouselItem = document.createElement('div');
+        carouselItem.classList.add('carousel-item');
+        if (index === 0) carouselItem.classList.add('active'); // První slide je aktivní
+
+    carouselItem.innerHTML = `
+        <img src="${image.url}" class="d-block w-100 rounded" alt="${image.description}">
+        <div class="carousel-caption d-none d-md-block">
+            <a href="${image.source}" target="_blank" class="carousel-source-link">${image.source}</a>
+            <p>${image.description}</p>
+        </div>
+    `;
+
+        carouselInner.appendChild(carouselItem);
+    });
+}
+
+// Inicializace carouselu pro sekci "Build"
+renderBuildCarousel();
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    function populateCarousel(section, carouselId) {
+        const carouselInner = document.querySelector(`#${carouselId} .carousel-inner`);
+        const items = galleryData[section];
+
+        items.forEach((item, index) => {
+            // Vytvoření položky karuselu
+            const carouselItem = document.createElement("div");
+            carouselItem.classList.add("carousel-item");
+            if (index === 0) {
+                carouselItem.classList.add("active"); // Nastavení první položky jako aktivní
+            }
+
+            // Vytvoření prvku obrázku
+            const imgElement = document.createElement("img");
+            imgElement.src = item.image;
+            imgElement.alt = item.text;
+            imgElement.classList.add("d-block", "w-100");
+
+            // Vytvoření popisku
+            const captionElement = document.createElement("div");
+            captionElement.classList.add("carousel-caption");
+
+            // Přidání textu popisku
+            const textElement = document.createElement("p");
+            textElement.textContent = item.text;
+            captionElement.appendChild(textElement);
+
+            // Přidání odkazu na zdroj, pokud existuje
+            if (item.source) {
+                const sourceElement = document.createElement("p");
+                const sourceLink = document.createElement("a");
+                sourceLink.href = item.source;
+                sourceLink.target = "_blank";
+                sourceLink.textContent = "Zdroj";
+                sourceElement.appendChild(sourceLink);
+                sourceElement.style.fontSize = "0.9rem";
+                sourceElement.style.marginTop = "5px";
+                captionElement.appendChild(sourceElement);
+            }
+
+            // Přidání obrázku a popisku do položky karuselu
+            carouselItem.appendChild(imgElement);
+            carouselItem.appendChild(captionElement);
+
+            // Přidání položky karuselu do kontejneru karuselu
+            carouselInner.appendChild(carouselItem);
+        });
+    }
+
+    // Inicializace všech galerií
+    Object.keys(galleryData).forEach((section) => {
+        const carouselId = `${section}Carousel`;
+        const carouselInner = document.querySelector(`#${carouselId} .carousel-inner`);
+        if (carouselInner) {
+            populateCarousel(section, carouselId);
+        }
+    });
+});
+
+
 
 // Fetch booked days from JSON file or API
 async function fetchBookedDays(month, year) {
@@ -129,11 +249,27 @@ async function createMonthCalendar(month, year) {
     document.getElementById("prev-month").addEventListener("click", () => changeMonth(-1));
     document.getElementById("next-month").addEventListener("click", () => changeMonth(1));
 
+    // Aktualizace dynamického textu na základě výběru
+    const calendarText = document.getElementById("calendar-text");
+    document.querySelectorAll(".day.free").forEach(dayElement => {
+        dayElement.addEventListener("click", () => {
+            const selectedDay = parseInt(dayElement.dataset.day, 10);
+            const selectedDate = new Date(year, month, selectedDay);
+
+            if (!config.selectedStartDate || (config.selectedStartDate && config.selectedEndDate)) {
+                calendarText.textContent = "Vyberte den odjezdu";
+            } else if (config.selectedStartDate && selectedDate > config.selectedStartDate) {
+                calendarText.textContent = ""; // Skryje text
+            }
+        });
+    });
+
     // Add event listeners to free days
     document.querySelectorAll(".day.free").forEach(dayElement => {
         dayElement.addEventListener("click", () => selectDay(dayElement, month, year));
     });
 }
+
 
 
 
@@ -373,4 +509,53 @@ document.getElementById('reservationForm').addEventListener('submit', async func
     await createMonthCalendar(config.defaultMonth, config.defaultYear);
     document.getElementById('reservation-form').classList.add('hidden');
     setMinDateForInputs();
+});
+
+
+
+// Dynamically populate the surroundings carousel
+function populateSurroundingsCarousel() {
+    const carouselInner = document.querySelector('#surroundingsCarousel .carousel-inner');
+    surroundingsGallery.forEach((item, index) => {
+        const carouselItem = document.createElement('div');
+        carouselItem.className = 'carousel-item' + (index === 0 ? ' active' : '');
+
+        // Image
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.alt = item.text;
+        img.className = 'd-block w-100';
+        carouselItem.appendChild(img);
+
+        // Caption container
+        const caption = document.createElement('div');
+        caption.className = 'carousel-caption';
+
+        // Text
+        const text = document.createElement('p');
+        text.textContent = item.text;
+        caption.appendChild(text);
+
+        // Source link
+        if (item.source) {
+            const sourceLink = document.createElement('a');
+            sourceLink.href = item.source;
+            sourceLink.textContent = 'Zdroj';
+            sourceLink.target = '_blank';
+            caption.appendChild(sourceLink);
+        }
+
+        carouselItem.appendChild(caption);
+        carouselInner.appendChild(carouselItem);
+    });
+}
+
+// Initialize all galleries
+document.addEventListener('DOMContentLoaded', () => {
+    Object.keys(galleryData).forEach(section => {
+        const carouselInner = document.querySelector(`#${section}Carousel .carousel-inner`);
+        if (carouselInner) {
+            populateCarousel(section);
+        }
+    });
 });

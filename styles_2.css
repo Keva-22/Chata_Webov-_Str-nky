@@ -140,7 +140,7 @@ p {
 
 @media (min-width: 1920px) {
     .carousel-inner img {
-        max-height: 750px;
+        max-height: 725px;
     }
 }
 
@@ -547,3 +547,76 @@ p {
         font-size: 1.1rem;
     }
 }
+
+#reservationForm textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    resize: vertical; /* Umožňuje měnit výšku textového pole */
+}
+
+#reservationForm textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
+#calendar-text {
+    font-size: 1.2rem;
+    color: #555;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+
+.carousel-caption a {
+    display: block !important; /* Umístí odkaz na samostatný řádek */
+    text-align: right !important; /* Zarovná odkaz doprava */
+    font-size: 0.85rem !important; /* Zmenší velikost textu odkazu */
+    color: blue !important; /* Barva odkazu */
+    text-decoration: none !important; /* Odstraní podtržení odkazu */
+    margin-top: 5px !important; /* Přidá prostor mezi odkazem a textem */
+    line-height: 1 !important; /* Nastaví správnou výšku řádku */
+}
+
+.carousel-caption a:hover {
+    text-decoration: underline !important; /* Podtržení při najetí myší */
+    color: darkblue !important; /* Ztmaví barvu při najetí myší */
+}
+
+.carousel-caption .carousel-source a {
+    font-size: 0.75rem !important;
+}
+
+/* Zvýrazněný text */
+.calendar-text {
+    font-size: 1.5rem !important; /* Zvýšená velikost textu */
+    font-weight: bold !important; /* Zvýraznění textu */
+    color: #507d2a !important; /* Zelená barva textu */
+    margin: 10px 0 !important; /* Odstup od ostatních prvků */
+    text-align: center !important; /* Zarovnání textu na střed */
+    letter-spacing: 1px !important; /* Přidání mezer mezi písmeny */
+    transition: transform 0.2s ease-in-out !important; /* Jemná animace při interakci */
+}
+
+#buildCarousel .carousel-inner img {
+    max-height: 500px; /* Maximální výška obrázků */
+    width: auto; /* Automatická šířka pro zachování proporcí */
+    margin: auto; /* Obrázky zarovnané na střed */
+    display: block; /* Zajištění správného zobrazení */
+    object-fit: cover; /* Ořízne obrázek, pokud je příliš velký */
+}
+
+#buildCarousel .carousel-inner {
+    overflow: hidden; /* Zabrání přetečení obrázků mimo karusel */
+}
+
+#buildCarousel .carousel-item {
+    text-align: center; /* Obsah karuselu zarovnán na střed */
+}
+

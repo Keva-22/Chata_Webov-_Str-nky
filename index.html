@@ -127,27 +127,23 @@
             </a>
         </div>
     </section>
-    <!-- Okolí -->
-    <section class="container mt-5">
-        <h3 class="text-center mb-4">Okolí</h3>
-        <p id="okoli-text"class="lead text-center">
-            Prozkoumejte krásy okolní přírody a aktivit, které si můžete užít během svého pobytu.
-        </p>
-        <div id="surroundingsCarousel" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner">
-                <!-- Dynamicky generované položky karuselu -->
-            </div>
-            <!-- Ovládací prvky karuselu -->
-            <a class="carousel-control-prev" href="#surroundingsCarousel" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Předchozí</span>
-            </a>
-            <a class="carousel-control-next" href="#surroundingsCarousel" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Další</span>
-            </a>
-        </div>        
-    </section>
+   <!-- Okolí -->
+   <section class="container mt-5">
+    <h3 class="text-center mb-4">Okolí</h3>
+    <div id="buildCarousel" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            <!-- Dynamicky naplněno JavaScriptem -->
+        </div>
+        <a class="carousel-control-prev" href="#buildCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#buildCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+</section>
 </section>
 
 <!-- Sekce Aktivity -->
@@ -164,10 +160,13 @@
 
 <section id="calendar" class="calendar-section">
     <h2>Rezervace</h2>
+    <!-- Zvýrazněný text -->
+    <div id="calendar-text-container" class="calendar-text-container">
+        <p id="calendar-text" class="calendar-text">Zvolte den příjezdu</p>
+    </div>
     <div class="reservation-container">
         <!-- Kalendář -->
         <div id="calendar-container" class="calendar">
-            <!-- Zde by měl být vložen kalendářní kód -->
             <p>Kalendář</p>
         </div>
         <!-- Rezervační formulář -->
@@ -193,12 +192,17 @@
                 <div>
                     <label for="phone">Telefon:</label>
                     <input type="tel" id="phone" name="phone" placeholder="Váš telefon" required pattern="^(\+420\s?)?(\d{3}\s?\d{3}\s?\d{3})$" title="Zadejte telefonní číslo ve formátu +420 123 456 789 nebo 123456789">
-                </div>                
+                </div>
+                <div>
+                    <label for="message">Zpráva:</label>
+                    <textarea id="message" name="message" placeholder="Sem napište dodatečné informace..." rows="4"></textarea>
+                </div>      
                 <button type="submit">Rezervovat</button>
             </form>
         </div>
     </div>
 </section>
+
 
 
 
