@@ -144,7 +144,6 @@ p {
     }
 }
 
-
 .carousel-caption {
     background-color: rgba(0, 0, 0, 0.7);
     padding: 10px;
@@ -620,3 +619,54 @@ p {
     text-align: center; /* Obsah karuselu zarovnán na střed */
 }
 
+.carousel-caption {
+    position: relative; /* Umožňuje lepší ovládání vnitřních prvků */
+    z-index: 10; /* Zajišťuje, že popisek a odkazy budou nad šipkami */
+    background: rgba(0, 0, 0, 0.5); /* Poloprůhledné pozadí */
+    padding: 10px;
+    border-radius: 8px;
+    color: #fff;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.carousel-source {
+    margin-bottom: 5px; /* Malá mezera pod odkazem */
+}
+
+.carousel-source a {
+    color: #ffc107; /* Barva odkazu */
+    text-decoration: none; /* Bez podtržení */
+    font-size: 0.9rem; /* Menší velikost textu */
+    display: inline-block; /* Zarovná odkaz pod text popisku */
+    position: relative; /* Umožňuje překonání problémů s šipkami */
+    z-index: 20; /* Zvýší prioritu oproti šipkám */
+}
+
+.carousel-source a:hover {
+    text-decoration: underline; /* Podtržení při najetí myší */
+    color: #ffeb3b; /* Světlejší barva při hoveru */
+}
+
+/* Šipky karuselu */
+.carousel-control-prev,
+.carousel-control-next {
+    z-index: 5; /* Snížení z-indexu šipek pod odkaz */
+}
+
+#buildCarousel .carousel-inner img {
+    max-height: 500px; /* Maximální výška obrázků */
+    width: auto; /* Automatická šířka pro zachování proporcí */
+    height: auto; /* Automatická výška */
+    object-fit: contain; /* Obrázky se přizpůsobí, aniž by byly oříznuty */
+    object-position: center; /* Zarovnání obrázků na střed */
+    display: block; /* Správné zobrazení obrázků v rámci bloku */
+    margin: 0 auto; /* Obrázky zarovnané na střed */
+}
+
+
+@media (min-width: 1920px) {
+    #buildCarousel .carousel-inner img {
+        max-height: 725px;
+    }
+}
