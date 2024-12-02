@@ -664,9 +664,9 @@ p {
     margin: 0 auto; /* Obrázky zarovnané na střed */
 }
 
-
 @media (min-width: 1920px) {
     #buildCarousel .carousel-inner img {
         max-height: 725px;
     }
 }
+

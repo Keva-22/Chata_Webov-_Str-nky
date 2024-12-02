@@ -15,6 +15,35 @@ function isDayInPast(day, month, year) {
     return date < today;
 }
 
+function loadLightGallery(callback) {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/lightgallery.js/dist/js/lightgallery.min.js";
+    script.onload = callback; // Call the callback after script loads
+    document.head.appendChild(script);
+
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://cdn.jsdelivr.net/npm/lightgallery.js/dist/css/lightgallery.min.css";
+    document.head.appendChild(link);
+}
+
+
+
+function initializeLightGallery() {
+    if (typeof lightGallery === "undefined") {
+        console.error("LightGallery is not defined. Make sure the library is loaded.");
+        return;
+    }
+    document.querySelectorAll('.carousel-inner').forEach(carousel => {
+        lightGallery(carousel, {
+            selector: 'img', // Target images
+            subHtmlSelectorRelative: true
+        });
+    });
+}
+
+
+
 // Nastavení minimálního data ve vstupních polích
 function setMinDateForInputs() {
     const startDateInput = document.getElementById("selected-start-date");
@@ -30,25 +59,25 @@ function setMinDateForInputs() {
 // Integrating surroundings data into the existing galleryData
 const galleryData = {
     bathroom: [
+        { image: "images/horni-koupelna-2.jpeg", text: "Horní koupelna 2" },
         { image: "images/dolni-koupelna-1.jpg", text: "Dolní koupelna" },
         { image: "images/horni-koupelna-1.jpg", text: "Horní koupelna" },
-        { image: "images/horni-koupelna-2.jpeg", text: "Horní koupelna 2" },
     ],
     kitchen: [
-        { image: "images/jidelna.jpeg", text: "Jídelna" },
-        { image: "images/kuchyn.jpg", text: "Kuchyň" },
         { image: "images/obyvak.jpg", text: "Obývák" },
         { image: "images/obyvak-2.jpeg", text: "Obývák 2" },
         { image: "images/obyvak-3.jpg", text: "Obývák 3" },
+        { image: "images/jidelna.jpeg", text: "Jídelna" },
+        { image: "images/kuchyn.jpg", text: "Kuchyň" },
     ],
     bedroom: [
-        { image: "images/loznice.jpeg", text: "Hlavní ložnice" },
         { image: "images/loznice-1.jpg", text: "Horní ložnice" },
         { image: "images/loznice-2.jpeg", text: "Dolní ložnice" },
+        { image: "images/loznice.jpeg", text: "Hlavní ložnice" },
     ],
     exterior: [
-        { image: "images/exterier-leto.jpg", text: "Exteriér léto" },
         { image: "images/exterier-zima.jpeg", text: "Exteriér zima" },
+        { image: "images/exterier-leto.jpg", text: "Exteriér léto" },
         { image: "images/terasa.jpeg", text: "Terasa" },
         { image: "images/vchod.jpg", text: "Vchod" },
     ],
@@ -56,6 +85,16 @@ const galleryData = {
 
 // Data pro sekci "Build"
 const buildImages = [
+    { 
+        url: "images/sjezdovka-nedaleko.jpeg", 
+        description: "Sjezdovka nedaleko", 
+        source: "" // Prázdný zdroj
+    },
+    { 
+        url: "images/stezka.jpeg", 
+        description: "Stezka v korunách stromů", 
+        source: "https://www.stezkakorunamistromu.cz/fotogalerie/zima-ea6bd2pe4g" 
+    },
     { 
         url: "images/jezero.jpg", 
         description: "Bruslení na zamrzlém jezeře", 
@@ -67,20 +106,10 @@ const buildImages = [
         source: "https://www.jiznicechy.cz/turisticke-cile/1983-rozhledna-dobra-voda" 
     },
     { 
-        url: "images/stezka.jpeg", 
-        description: "Stezka v korunách stromů", 
-        source: "https://www.stezkakorunamistromu.cz/fotogalerie/zima-ea6bd2pe4g" 
-    },
-    { 
         url: "images/zimni-priroda.jpeg", 
         description: "Zimní příroda", 
         source: "" // Prázdný zdroj
     },
-    { 
-        url: "images/sjezdovka-nedaleko.jpeg", 
-        description: "Sjezdovka nedaleko", 
-        source: "" // Prázdný zdroj
-    }
 ];
 
 function renderBuildCarousel() {
@@ -111,10 +140,12 @@ function renderBuildCarousel() {
 
         carouselInner.appendChild(carouselItem);
     });
+    initializeLightGallery(); // Add this line
 }
 
 // Inicializace carouselu pro sekci "Build"
 renderBuildCarousel();
+loadLightGallery(); // Add this line
 
 
 
@@ -166,6 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Přidání položky karuselu do kontejneru karuselu
             carouselInner.appendChild(carouselItem);
         });
+        initializeLightGallery(); // Add this line
     }
 
     // Inicializace všech galerií
@@ -176,6 +208,8 @@ document.addEventListener("DOMContentLoaded", function () {
             populateCarousel(section, carouselId);
         }
     });
+    renderBuildCarousel();
+    loadLightGallery(); // Add this line
 });
 
 
@@ -478,7 +512,69 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("reservation-form").style.display = "none";
         setMinDateForInputs(); // Resetujeme min data po odeslání
     });
+
+    // Warte, bis alle Bilder geladen sind
+    await imagesLoaded();
+    adjustSectionHeights();
 });
+
+// Funktion, die zurückgibt, wenn alle Bilder geladen sind
+function imagesLoaded() {
+    return new Promise((resolve) => {
+        const images = document.querySelectorAll('.carousel-image');
+        let loadedCount = 0;
+        const totalImages = images.length;
+
+        images.forEach((img) => {
+            if (img.complete) {
+                loadedCount++;
+                if (loadedCount === totalImages) {
+                    resolve();
+                }
+            } else {
+                img.addEventListener('load', () => {
+                    loadedCount++;
+                    if (loadedCount === totalImages) {
+                        resolve();
+                    }
+                });
+            }
+        });
+
+        // Falls es keine Bilder gibt
+        if (totalImages === 0) {
+            resolve();
+        }
+    });
+}
+
+// Funktion zum Anpassen der Abschnittshöhen
+function adjustSectionHeights() {
+    const images = document.querySelectorAll('.carousel-image');
+    let tallestHeight = 0;
+
+    images.forEach((img) => {
+        // Prüfe, ob die Bildquelle auf '.jpeg' oder '.jpg' endet
+        if (img.src.endsWith('.jpeg') || img.src.endsWith('.jpg')) {
+            const imgHeight = img.naturalHeight;
+            if (imgHeight > tallestHeight) {
+                tallestHeight = imgHeight;
+            }
+        }
+    });
+
+    // Wenn wir eine Höhe gefunden haben, setzen wir sie für die Abschnitte
+    if (tallestHeight > 0) {
+        // Hole alle gewünschten Abschnitte
+        const gallerySections = document.querySelectorAll('#gallery > section.container.mt-5');
+
+        gallerySections.forEach((section) => {
+            section.style.height = tallestHeight + 'px';
+            section.style.overflow = 'hidden'; // Um sicherzustellen, dass nichts überläuft
+        });
+    }
+}
+
 
 document.getElementById('reservationForm').addEventListener('submit', async function(event) {
     event.preventDefault();
@@ -552,3 +648,54 @@ function populateSurroundingsCarousel() {
         carouselInner.appendChild(carouselItem);
     });
 }
+
+function adjustSectionHeights() {
+    const sections = document.querySelectorAll('#gallery > section.container.mt-5');
+
+    sections.forEach(section => {
+        const title = section.querySelector('h3'); // Nadpis
+        const carouselInner = section.querySelector('.carousel-inner'); // Obsah karuselu
+        let totalHeight = 0;
+
+        // Přidejte výšku nadpisu
+        if (title) {
+            totalHeight += title.offsetHeight || 0; // Skutečná výška nadpisu
+        }
+
+        // Zpracování karuselu, pokud existuje
+        if (carouselInner) {
+            const activeSlide = carouselInner.querySelector('.carousel-item.active'); // Aktivní slide
+            if (activeSlide) {
+                const img = activeSlide.querySelector('img'); // Obrázek
+                const caption = activeSlide.querySelector('.carousel-caption'); // Popisek
+                const source = caption?.querySelector('.carousel-source'); // Zdroj v popisku (pokud existuje)
+
+                // Přidejte výšku obrázku
+                if (img) {
+                    totalHeight += img.clientHeight || 0; // Skutečná výška obrázku
+                }
+
+                // Přidejte výšku popisku
+                if (caption) {
+                    totalHeight += caption.scrollHeight || 0; // Skutečná výška popisku
+                }
+
+                // Přidejte výšku zdroje
+                if (source) {
+                    totalHeight += source.scrollHeight || 0; // Skutečná výška zdroje
+                }
+            }
+        }
+
+        // Nastavte výšku sekce
+        if (totalHeight > 0) {
+            section.style.height = `${totalHeight}px`; // Nastavení výšky sekce
+        }
+    });
+}
+
+// Spuštění po načtení obsahu a změně velikosti okna
+window.addEventListener('load', () => {
+    setTimeout(adjustSectionHeights, 100); // Počkejte na načtení obrázků a karuselu
+});
+window.addEventListener('resize', adjustSectionHeights);
