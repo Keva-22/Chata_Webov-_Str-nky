@@ -603,13 +603,7 @@ p {
     transition: transform 0.2s ease-in-out !important; /* Jemná animace při interakci */
 }
 
-#buildCarousel .carousel-inner img {
-    max-height: 500px; /* Maximální výška obrázků */
-    width: auto; /* Automatická šířka pro zachování proporcí */
-    margin: auto; /* Obrázky zarovnané na střed */
-    display: block; /* Zajištění správného zobrazení */
-    object-fit: cover; /* Ořízne obrázek, pokud je příliš velký */
-}
+
 
 #buildCarousel .carousel-inner {
     overflow: hidden; /* Zabrání přetečení obrázků mimo karusel */
@@ -670,3 +664,7 @@ p {
     }
 }
 
+
+.container.mt-5 {
+    margin-bottom: 75px; /* Přidá volné místo pod sekci */
+}
