@@ -15,33 +15,6 @@ function isDayInPast(day, month, year) {
     return date < today;
 }
 
-function loadLightGallery(callback) {
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/lightgallery.js/dist/js/lightgallery.min.js";
-    script.onload = callback; // Call the callback after script loads
-    document.head.appendChild(script);
-
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://cdn.jsdelivr.net/npm/lightgallery.js/dist/css/lightgallery.min.css";
-    document.head.appendChild(link);
-}
-
-
-
-function initializeLightGallery() {
-    if (typeof lightGallery === "undefined") {
-        console.error("LightGallery is not defined. Make sure the library is loaded.");
-        return;
-    }
-    document.querySelectorAll('.carousel-inner').forEach(carousel => {
-        lightGallery(carousel, {
-            selector: 'img', // Target images
-            subHtmlSelectorRelative: true
-        });
-    });
-}
-
 
 
 // Nastavení minimálního data ve vstupních polích
@@ -140,12 +113,10 @@ function renderBuildCarousel() {
 
         carouselInner.appendChild(carouselItem);
     });
-    initializeLightGallery(); // Add this line
 }
 
 // Inicializace carouselu pro sekci "Build"
 renderBuildCarousel();
-loadLightGallery(); // Add this line
 
 
 
@@ -197,7 +168,6 @@ document.addEventListener("DOMContentLoaded", function () {
             // Přidání položky karuselu do kontejneru karuselu
             carouselInner.appendChild(carouselItem);
         });
-        initializeLightGallery(); // Add this line
     }
 
     // Inicializace všech galerií
@@ -209,7 +179,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
     renderBuildCarousel();
-    loadLightGallery(); // Add this line
 });
 
 
@@ -548,13 +517,42 @@ function imagesLoaded() {
     });
 }
 
-// Funktion zum Anpassen der Abschnittshöhen
+// Funktion, die zurückgibt, wenn alle Bilder geladen sind
+function imagesLoaded() {
+    return new Promise((resolve) => {
+        const images = document.querySelectorAll('.carousel-image');
+        let loadedCount = 0;
+        const totalImages = images.length;
+
+        images.forEach((img) => {
+            if (img.complete) {
+                loadedCount++;
+                if (loadedCount === totalImages) {
+                    resolve();
+                }
+            } else {
+                img.addEventListener('load', () => {
+                    loadedCount++;
+                    if (loadedCount === totalImages) {
+                        resolve();
+                    }
+                });
+            }
+        });
+
+        // Pokud nejsou žádné obrázky
+        if (totalImages === 0) {
+            resolve();
+        }
+    });
+}
+
+// Nová, sloučená a upravená verze adjustSectionHeights():
 function adjustSectionHeights() {
     const images = document.querySelectorAll('.carousel-image');
     let tallestHeight = 0;
 
     images.forEach((img) => {
-        // Prüfe, ob die Bildquelle auf '.jpeg' oder '.jpg' endet
         if (img.src.endsWith('.jpeg') || img.src.endsWith('.jpg')) {
             const imgHeight = img.naturalHeight;
             if (imgHeight > tallestHeight) {
@@ -563,17 +561,66 @@ function adjustSectionHeights() {
         }
     });
 
-    // Wenn wir eine Höhe gefunden haben, setzen wir sie für die Abschnitte
-    if (tallestHeight > 0) {
-        // Hole alle gewünschten Abschnitte
-        const gallerySections = document.querySelectorAll('#gallery > section.container.mt-5');
+    const sections = document.querySelectorAll('#gallery > section.container.mt-5');
 
-        gallerySections.forEach((section) => {
-            section.style.height = tallestHeight + 'px';
-            section.style.overflow = 'hidden'; // Um sicherzustellen, dass nichts überläuft
-        });
-    }
+    sections.forEach(section => {
+        const title = section.querySelector('h3');
+        const carouselInner = section.querySelector('.carousel-inner');
+        let totalHeight = 0;
+
+        if (title) {
+            totalHeight += title.offsetHeight || 0;
+        }
+
+        if (carouselInner) {
+            const activeSlide = carouselInner.querySelector('.carousel-item.active');
+            if (activeSlide) {
+                const img = activeSlide.querySelector('img');
+                const caption = activeSlide.querySelector('.carousel-caption');
+                const source = caption?.querySelector('.carousel-source');
+
+                if (img) {
+                    totalHeight += img.clientHeight || 0;
+                }
+                if (caption) {
+                    totalHeight += caption.scrollHeight || 0;
+                }
+                if (source) {
+                    totalHeight += source.scrollHeight || 0;
+                }
+            }
+        }
+
+        // Porovnáme s tallestHeight, pokud ho chcete používat:
+        let finalHeight = Math.max(totalHeight, tallestHeight);
+
+        if (finalHeight > 0) {
+            section.style.height = `${finalHeight}px`;
+            if (carouselInner) {
+                carouselInner.style.height = `${finalHeight}px`;
+            }
+        }
+    });
 }
+
+// Zbytek vašeho kódu (formulář, populateSurroundingsCarousel, atd.)
+document.getElementById('reservationForm').addEventListener('submit', async function(event) {
+    // ... váš kód pro validaci a odeslání formuláře ...
+});
+
+function populateSurroundingsCarousel() {
+    // ... váš kód pro okolí ...
+}
+
+// Event listenery na konci
+window.addEventListener('load', () => {
+    // Počkejte na načtení obrázků, pak zavolejte adjustSectionHeights()
+    imagesLoaded().then(() => {
+        setTimeout(adjustSectionHeights, 100);
+    });
+});
+
+window.addEventListener('resize', adjustSectionHeights);
 
 
 document.getElementById('reservationForm').addEventListener('submit', async function(event) {
@@ -649,50 +696,6 @@ function populateSurroundingsCarousel() {
     });
 }
 
-function adjustSectionHeights() {
-    const sections = document.querySelectorAll('#gallery > section.container.mt-5');
-
-    sections.forEach(section => {
-        const title = section.querySelector('h3'); // Nadpis
-        const carouselInner = section.querySelector('.carousel-inner'); // Obsah karuselu
-        let totalHeight = 0;
-
-        // Přidejte výšku nadpisu
-        if (title) {
-            totalHeight += title.offsetHeight || 0; // Skutečná výška nadpisu
-        }
-
-        // Zpracování karuselu, pokud existuje
-        if (carouselInner) {
-            const activeSlide = carouselInner.querySelector('.carousel-item.active'); // Aktivní slide
-            if (activeSlide) {
-                const img = activeSlide.querySelector('img'); // Obrázek
-                const caption = activeSlide.querySelector('.carousel-caption'); // Popisek
-                const source = caption?.querySelector('.carousel-source'); // Zdroj v popisku (pokud existuje)
-
-                // Přidejte výšku obrázku
-                if (img) {
-                    totalHeight += img.clientHeight || 0; // Skutečná výška obrázku
-                }
-
-                // Přidejte výšku popisku
-                if (caption) {
-                    totalHeight += caption.scrollHeight || 0; // Skutečná výška popisku
-                }
-
-                // Přidejte výšku zdroje
-                if (source) {
-                    totalHeight += source.scrollHeight || 0; // Skutečná výška zdroje
-                }
-            }
-        }
-
-        // Nastavte výšku sekce
-        if (totalHeight > 0) {
-            section.style.height = `${totalHeight}px`; // Nastavení výšky sekce
-        }
-    });
-}
 
 // Spuštění po načtení obsahu a změně velikosti okna
 window.addEventListener('load', () => {
