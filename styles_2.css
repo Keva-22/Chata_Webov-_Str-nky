@@ -274,7 +274,8 @@ h2::after {
 
 
 #activities {
-    margin: 0px; /* Snížení mezery nad sekcí Aktivity */
+    margin-top: 0px; /* Snížení mezery nad sekcí Aktivity */
+    margin-bottom: 0px;
 }
 
 
