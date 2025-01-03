@@ -186,9 +186,17 @@ document.addEventListener("DOMContentLoaded", function () {
 // Fetch booked days from JSON file or API
 async function fetchBookedDays(month, year) {
     try {
-        const response = await fetch('reservations.json');
-        const data = await response.json();
-        return data[`${year}-${month}`] || [];
+        // If 'month' is zero-based (Jan=0), then do 'month + 1'
+        // for the API call, since your server route expects Jan=1
+        const response = await fetch(`http://localhost:3000/api/reservations/${year}/${month + 1}`);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch: ${response.statusText}`);
+        }
+        
+        // The server returns an array of day numbers
+        const bookedDaysArray = await response.json(); // e.g. [5,6,7]
+        return bookedDaysArray;
     } catch (error) {
         console.error('Error fetching reservations:', error);
         return [];
@@ -474,7 +482,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const reservationFormElement = document.getElementById("reservationForm");
     reservationFormElement?.addEventListener("submit", event => {
         event.preventDefault();
-        alert("Rezervace odeslána!");
         config.selectedStartDate = null;
         config.selectedEndDate = null;
         createMonthCalendar(config.defaultMonth, config.defaultYear);
@@ -603,14 +610,72 @@ function adjustSectionHeights() {
     });
 }
 
-// Zbytek vašeho kódu (formulář, populateSurroundingsCarousel, atd.)
 document.getElementById('reservationForm').addEventListener('submit', async function(event) {
-    // ... váš kód pro validaci a odeslání formuláře ...
+    event.preventDefault();
+
+    // Collect form data
+    const startDate = document.getElementById('selected-start-date').value;
+    const endDate = document.getElementById('selected-end-date').value;
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const message = document.getElementById('message').value;
+
+    // Validate inputs
+    if (!startDate || !endDate || !name || !email || !phone) {
+        alert('Vyplňte všechna povinná pole.');
+        return;
+    }
+
+    try {
+        // Send data to the backend
+        const response = await fetch('http://localhost:3000/api/reservations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                startDate,
+                endDate,
+                name,
+                email,
+                phone,
+                message,
+            }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert('Rezervace přijata. Potvrzení pošleme emailem.');
+            // Reset form and update calendar
+            try {
+                const month = config.defaultMonth + 1; // if config.defaultMonth is 0-based
+                const year = config.defaultYear;
+                
+                const responseBookedDays = await fetch(`http://localhost:3000/api/reservations/${year}/${month}`);
+                const blockedDays = await responseBookedDays.json();
+
+            } catch (error) {
+                console.error('Error re-fetching booked days:', error);
+            }
+        
+            config.selectedStartDate = null;
+            config.selectedEndDate = null;
+            await createMonthCalendar(config.defaultMonth, config.defaultYear);
+
+
+            document.getElementById('reservation-form').classList.add('hidden');
+            setMinDateForInputs();
+        } else {
+            alert(`Chyba: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Chyba při odesílání rezervace:', error);
+        alert('Chyba při odesílání rezervace. Zkuste to prosím znovu.');
+    }
 });
 
-function populateSurroundingsCarousel() {
-    // ... váš kód pro okolí ...
-}
 
 // Event listenery na konci
 window.addEventListener('load', () => {
